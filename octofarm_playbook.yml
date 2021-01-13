@@ -1,0 +1,73 @@
+---
+- hosts: localhost
+
+  tasks:
+  - name: Add an Apt signing key for MongoDB 4.2
+    apt_key:
+      url: https://www.mongodb.org/static/pgp/server-4.2.asc 
+      state: present
+    become: yes
+  - name: Add MongoDB 4.2 repository into sources list
+    apt_repository:
+      repo: deb [ arch=arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse
+      state: present
+    become: yes
+  - name: Add an Apt signing key for Node 12
+    apt_key:
+      url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+      state: present
+    become: yes
+  - name: Add Node 12 repository into sources list
+    apt_repository:
+      repo: deb https://deb.nodesource.com/node_12.x buster main
+      state: present
+    become: yes
+    
+  - name: Install Octofarm apt dependencies
+    become: yes
+    apt:
+      update_cache: yes
+      pkg:
+      - git
+      - build-essential
+      - nodejs
+      - gcc 
+      - g++
+      - make
+      - mongodb-org
+  - name: Git checkout
+    git:
+      repo: 'https://github.com/NotExpectedYet/OctoFarm.git'
+      dest: ~/OctoFarm
+      depth: 1
+      force: yes  # Does this break things?  We shall see
+  - name: Start MongoDB
+    become: yes
+    systemd:
+     state: restarted
+     daemon_reload: yes
+     enabled: yes
+     name: mongod
+  - name: Install pm2
+    shell: npm install pm2 -g
+    become: yes
+  - name: Start OctoFarm
+    args:
+      chdir: ~/OctoFarm/
+    shell: pm2 stop OctoFarm ; npm start
+  - name: Workaround for first start of PM2 - ignore this
+    shell: pm2 startup  #Run this once to get past their stupid splash screen, ignore it, then run it for real next time
+    ignore_errors: yes
+  - name: Generate pm2 startup scripts
+    shell: pm2 startup | sed -n 3p | bash #Get the 3rd line of output from startup command and run it as sudo
+    args:
+      chdir: ~/OctoFarm/
+  - name: Save pm2 setup
+    shell: pm2 save
+    args:
+      chdir: ~/OctoFarm/
+  - name: Start APP
+    sudo_user: ubuntu
+    command: pm2 start index.js --name app chdir={{homeDir}}/{{appDir}}/backened
+    ignore_errors: yes
+    when: npm_finished.changed
