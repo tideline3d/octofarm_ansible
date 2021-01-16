@@ -39,7 +39,7 @@
     git:
       repo: 'https://github.com/NotExpectedYet/OctoFarm.git'
       dest: ~/OctoFarm
-      depth: 1
+      depth: "1"
       force: yes  # Does this break things?  We shall see
   - name: Start MongoDB
     become: yes
@@ -66,8 +66,3 @@
     shell: pm2 save
     args:
       chdir: ~/OctoFarm/
-  - name: Start APP
-    sudo_user: ubuntu
-    command: pm2 start index.js --name app chdir={{homeDir}}/{{appDir}}/backened
-    ignore_errors: yes
-    when: npm_finished.changed
