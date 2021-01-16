@@ -37,7 +37,7 @@
      state: restarted
      daemon_reload: yes
      enabled: yes
-     name: mongod
+     name: mongodb
   - name: Install pm2
     shell: npm install pm2 -g
     become: yes
