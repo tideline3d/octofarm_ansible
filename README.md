@@ -3,7 +3,7 @@ An ansible playbook for deploying &amp; updating OctoFarm on a local Ubuntu mach
 
 Tested against Ubuntu 20.04
 
-Install ansible `sudo apt install ansible`
+Install ansible `sudo apt update && sudo apt install ansible`
 
 Clone the repo `git clone https://github.com/tideline3d/octofarm_ansible.git`
 
