@@ -2,16 +2,6 @@
 - hosts: localhost
 
   tasks:
-  - name: Add an Apt signing key for MongoDB 4.2
-    apt_key:
-      url: https://www.mongodb.org/static/pgp/server-4.2.asc 
-      state: present
-    become: yes
-  - name: Add MongoDB 4.2 repository into sources list
-    apt_repository:
-      repo: deb [ arch=arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse
-      state: present
-    become: yes
   - name: Add an Apt signing key for Node 12
     apt_key:
       url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
@@ -34,7 +24,7 @@
       - gcc 
       - g++
       - make
-      - mongodb-org
+      - mongodb
   - name: Git checkout
     git:
       repo: 'https://github.com/NotExpectedYet/OctoFarm.git'
